@@ -51,13 +51,54 @@
 const dotenv = require("dotenv").config();
 const req = require("request");
 const Twitter = require("twitter");
-const Spotify = require("spotify");
+const Spotify = require("node-spotify-api");
 const keys = require("./keys.js");
 
-var client = new Twitter(keys.twitter);
+const twitterUser = "steinbot"; // replace with your or any twitter username
 
-client.post('statuses/update', {status: 'I Love Twitter 6'},  function(error, tweet, response) {
-    if(error) throw error;
-    console.log(tweet);  // Tweet body.
-    console.log(response);  // Raw response object.
-  });
+const client = new Twitter(keys.twitter);
+const spotify = new Spotify(keys.spotify);
+
+function myTweets() {
+
+    client.get('statuses/user_timeline', { screen_name: twitterUser, count: 1 }, function (error, tweets, response) {
+        console.log(tweets[0].text);
+        console.log(tweets[0].created_at);
+    });
+}
+
+function spotifySong() {
+    var song = process.argv.slice(3).join(" ");
+
+    console.log("Song received: " + song);
+
+    if (!song) {
+        song = "As If The World Wasn't Ending";
+    }
+
+    spotify.search({ type: 'track', query: song, limit: 1 }, function (err, res) {
+        if (err) {
+            console.log("Error occurred: " + err);
+            return;
+        }
+
+        var data = res.tracks.items[0];
+
+        console.log(data.artists[0].name); // Name of artist
+        console.log(data.name); // Name of song
+        console.log(data.external_urls.spotify); // Sample song
+        console.log(data.album.name); // Name of album
+    });
+}
+
+function movieThis() {
+    var movie = process.argv.slice(3).join(" ");
+}
+
+function simonSays() {
+
+}
+
+myTweets();
+
+spotifySong();
